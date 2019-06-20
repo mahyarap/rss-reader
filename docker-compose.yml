@@ -1,0 +1,23 @@
+version: "3"
+services:
+  web:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/web/Dockerfile
+    command: >
+      uwsgi --wsgi-file rss_reader/wsgi.py --http :8080 --py-auto-reload 1
+    ports:
+      - 8080:8080
+    volumes:
+      - ./rss_reader:/app
+
+  postgres:
+    image: postgres:11-alpine
+    volumes:
+      - rss_reader-db:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: rss_reader
+      POSTGRES_PASSWORD: password
+
+volumes:
+  rss_reader-db:
