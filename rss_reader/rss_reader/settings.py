@@ -37,6 +37,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    'rest_framework',
+    'rest_framework.authtoken',
+
+    'authnz',
 ]
 
 MIDDLEWARE = [
@@ -69,6 +74,7 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'rss_reader.wsgi.application'
 
+AUTH_USER_MODEL = 'authnz.User'
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
