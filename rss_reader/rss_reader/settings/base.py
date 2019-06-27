@@ -13,7 +13,10 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = os.path.dirname(
+    os.path.dirname(
+        os.path.dirname(
+            os.path.abspath(__file__))))
 
 
 # Quick-start development settings - unsuitable for production
@@ -21,11 +24,6 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'pgt07a7%(fi9)g7l-6@v_t@wshcx0kq0wl%l*r0i-(1yv!0v9$'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
-
-ALLOWED_HOSTS = ['']
 
 
 # Application definition
@@ -77,20 +75,6 @@ WSGI_APPLICATION = 'rss_reader.wsgi.application'
 
 AUTH_USER_MODEL = 'authnz.User'
 
-# Database
-# https://docs.djangoproject.com/en/1.11/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'rss_reader',
-        'USER': 'rss_reader',
-        'PASSWORD': 'password',
-        'HOST': 'postgres',
-        'PORT': '5432',
-    }
-}
-
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
@@ -129,3 +113,69 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
 STATIC_URL = '/static/'
+
+
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/'
+
+
+CELERY_BROKER_URL = 'redis://redis/0'
+CELERY_RESULT_BACKEND = 'redis://redis/0'
+CELERY_BEAT_SCHEDULE = {
+    'high_priority_tasks': {
+        'task': 'reader.tasks.feed_indexer_coordinator',
+        'schedule': 60,
+        'args': ('HIGH',)
+    },
+    'medium_priority_tasks': {
+        'task': 'reader.tasks.feed_indexer_coordinator',
+        'schedule': 3 * 60,
+        'args': ('MEDIUM',)
+    },
+    'low_priority_tasks': {
+        'task': 'reader.tasks.feed_indexer_coordinator',
+        'schedule': 5 * 60,
+        'args': ('LOW',)
+    }
+}
+
+
+LOGGING = {
+    'disable_existing_loggers': False,
+    'version': 1,
+    'handlers': {
+        'console': {
+            # logging handler that outputs log messages to terminal
+            'class': 'logging.StreamHandler',
+            'level': 'DEBUG', # message level to be written to console
+        },
+    },
+    'loggers': {
+        '': {
+            # this sets root level logger to log debug and higher level
+            # logs to console. All other loggers inherit settings from
+            # root level logger.
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': False, # this tells logger to send logging message
+                                # to its parent (will send if set to True)
+        },
+        'django.db': {
+            # 'level': 'DEBUG'
+        },
+    },
+}
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework.authentication.TokenAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
+    'TEST_REQUEST_DEFAULT_FORMAT': 'json',
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 100,
+}

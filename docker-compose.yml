@@ -10,6 +10,8 @@ services:
       - 8080:8080
     volumes:
       - ./rss_reader:/app
+    environment:
+      - DJANGO_SETTINGS_MODULE=rss_reader.settings.dev
 
   postgres:
     image: postgres:11-alpine
