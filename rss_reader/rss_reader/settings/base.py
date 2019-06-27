@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+import sys
+import logging
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(
@@ -140,30 +142,32 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 
+if len(sys.argv) > 1 and sys.argv[1] == 'test':
+    logging.disable(logging.CRITICAL)
+
+
 LOGGING = {
-    'disable_existing_loggers': False,
     'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
     'handlers': {
         'console': {
-            # logging handler that outputs log messages to terminal
+            'level': 'INFO',
             'class': 'logging.StreamHandler',
-            'level': 'DEBUG', # message level to be written to console
+            'formatter': 'simple'
         },
     },
     'loggers': {
-        '': {
-            # this sets root level logger to log debug and higher level
-            # logs to console. All other loggers inherit settings from
-            # root level logger.
+        'django': {
             'handlers': ['console'],
-            'level': 'DEBUG',
-            'propagate': False, # this tells logger to send logging message
-                                # to its parent (will send if set to True)
+            'level': 'WARN',
+            'propagate': True,
         },
-        'django.db': {
-            # 'level': 'DEBUG'
-        },
-    },
+    }
 }
 
 

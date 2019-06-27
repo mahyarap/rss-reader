@@ -1,5 +1,6 @@
 import time 
 import uuid
+import logging
 from datetime import datetime
 
 from django.utils.text import slugify
@@ -11,6 +12,9 @@ from requests.exceptions import Timeout
 from celery import group, shared_task, current_app
 
 from . import models
+
+
+logger = logging.getLogger(__name__)
 
 
 @shared_task
@@ -57,6 +61,9 @@ def feed_indexer(url, feed_id):
         resp = requests.get(url, timeout=2)
         feed.increment_priority()
     except Timeout:
+        logger.warning(
+            'Timeout during indexing: feed_id: {}'.format(feed_id)
+        )
         feed.decrement_priority()
         return
 
@@ -64,6 +71,9 @@ def feed_indexer(url, feed_id):
     # If feed is malformed
     if parsed.bozo == 1:
         feed.decrement_priority()
+        logger.warning(
+            'Feed is malformed: feed_id: {}'.format(feed_id)
+        )
         return
     else:
         feed.increment_priority()

@@ -1,3 +1,4 @@
+import logging
 from urllib.parse import urlparse
 
 from django.db import transaction
@@ -8,7 +9,7 @@ from rest_framework import serializers
 
 import requests
 import feedparser
-from requests.exceptions import Timeout
+from requests.exceptions import Timeout, ConnectionError
 from requests.utils import prepend_scheme_if_needed
 
 from . import tasks
@@ -16,6 +17,7 @@ from . import models
 
 
 User = get_user_model()
+logger = logging.getLogger(__name__)
 
 
 class FeedSerializer(serializers.ModelSerializer):
@@ -45,11 +47,26 @@ class FeedSerializer(serializers.ModelSerializer):
         try:
             resp = requests.get(validated_data['url'], timeout=3)
         except Timeout:
+            logger.warning(
+                'Timeout during creating feed: {}'.format(validated_data['url'])
+            )
             raise serializers.ValidationError(
                 {'none_field_errors': ['Error resolving URL']}
             )
+        except ConnectionError:
+            logger.warning(
+                'Connection error during creating feed: {}'.format(
+                    validated_data['url'])
+            )
+            raise serializers.ValidationError(
+                {'none_field_errors': ['Error resolving URL']}
+            )
+
         parsed_feed = feedparser.parse(resp.content)
         if parsed_feed.bozo == 1:
+            logger.warning(
+                'Feed is malformed: {}'.format(validated_data['url'])
+            )
             raise serializers.ValidationError(
                 {'none_field_errors': ['No feed found']}
             )
