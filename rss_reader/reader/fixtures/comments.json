@@ -1,0 +1,13 @@
+[
+{
+  "model": "reader.comment",
+  "pk": 1,
+  "fields": {
+    "author": 1,
+    "entry": 1,
+    "content": "Frist comment",
+    "created_at": "2019-06-28T10:16:34.658Z",
+    "updated_at": null
+  }
+}
+]

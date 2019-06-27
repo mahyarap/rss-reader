@@ -1,0 +1,29 @@
+[
+{
+  "model": "reader.read",
+  "pk": 1,
+  "fields": {
+    "owner": 1,
+    "entry": 1,
+    "is_read": true
+  }
+},
+{
+  "model": "reader.read",
+  "pk": 2,
+  "fields": {
+    "owner": 2,
+    "entry": 1,
+    "is_read": true
+  }
+},
+{
+  "model": "reader.read",
+  "pk": 3,
+  "fields": {
+    "owner": 2,
+    "entry": 2,
+    "is_read": true
+  }
+}
+]
