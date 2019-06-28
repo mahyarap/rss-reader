@@ -13,6 +13,39 @@ services:
     environment:
       - DJANGO_SETTINGS_MODULE=rss_reader.settings.dev
 
+  scraper:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/scraper/Dockerfile
+    command: celery -A rss_reader worker -l info -P eventlet -c 100
+    volumes:
+      - ./rss_reader:/app
+    environment:
+      - DJANGO_SETTINGS_MODULE=rss_reader.settings.dev
+
+  beat:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/beat/Dockerfile
+    command: celery -A rss_reader beat -l info --pidfile /tmp/celerybeat.pid
+    volumes:
+      - ./rss_reader:/app
+    environment:
+      - DJANGO_SETTINGS_MODULE=rss_reader.settings.dev
+
+  frontend:
+    build:
+      context: .
+      dockerfile: ./dockerfiles/frontend/Dockerfile
+    command: npm start
+    ports:
+      - 8000:3000
+    volumes:
+      - ./frontend:/app
+
+  redis:
+    image: redis:4.0.13-alpine3.9
+
   postgres:
     image: postgres:11-alpine
     volumes:
