@@ -32,7 +32,7 @@ There are 5 services in the project:
 * redis server as the message broker
 * PostGreSQL server as the database
 
-The is a summary of each service (except for postgres and redis) in the
+You can find the summary of each service (except for postgres and redis) in the
 following paragraphs:
 
 The backend only exposes a REST API to be consumed by the frontend. Having an
