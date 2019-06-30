@@ -105,7 +105,10 @@ To run the tests simply run:
 docker-compose exec web python manage.py test
 ```
 
-## Final Note
+## Final Notes
 Please note that the way this project has been configured is not
 production-ready. For production it needs many more configurations such as
 removing the hard-coded secrets and passing environment variables.
+
+The frontend should actually reside in a separate repository. I put it in this
+repo to have everything in one place in order to ease the reviewing.
