@@ -13,7 +13,17 @@ To bring the whole project up, simply run:
 docker-compose up -d
 ```
 
-When everything is up, enter the following URL in your favorite browser:
+Then run the migrations:
+```
+docker-compose exec python manage.py migrate
+```
+
+Optionally create a super user:
+```
+docker-compose exec python manage.py createsuperuser
+```
+
+When migrations are done, enter the following URL in your favorite browser:
 ```
 http://localhost:8000
 ```
