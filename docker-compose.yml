@@ -12,6 +12,9 @@ services:
       - ./rss_reader:/app
     environment:
       - DJANGO_SETTINGS_MODULE=rss_reader.settings.dev
+    depends_on:
+      - postgres
+      - redis
 
   scraper:
     build:
@@ -22,6 +25,9 @@ services:
       - ./rss_reader:/app
     environment:
       - DJANGO_SETTINGS_MODULE=rss_reader.settings.dev
+    depends_on:
+      - postgres
+      - redis
 
   beat:
     build:
@@ -32,6 +38,9 @@ services:
       - ./rss_reader:/app
     environment:
       - DJANGO_SETTINGS_MODULE=rss_reader.settings.dev
+    depends_on:
+      - postgres
+      - redis
 
   frontend:
     build:
@@ -41,7 +50,13 @@ services:
     ports:
       - 8000:3000
     volumes:
-      - ./frontend:/app
+      - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
+      - ./frontend/package.json:/app/package.json
+      - ./frontend/yarn.lock:/app/yarn.lock
+      - ./frontend/package-lock.json:/app/package-lock.json
+    depends_on:
+      - web
 
   redis:
     image: redis:4.0.13-alpine3.9
