@@ -107,7 +107,7 @@ accidentally revealing settings and secrets to the public. However in the
 
 All services use multi-stage docker build to reduce their final image size
 except for the frontend image because its final artifact is a static bundle not
-a service (e.g. putting the bundle in an Nginx image).
+a service (one could put the bundle in an Nginx image and serve it).
 
 ## Running Tests
 To run the tests simply run:
