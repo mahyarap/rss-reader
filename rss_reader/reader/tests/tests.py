@@ -1,7 +1,7 @@
 from unittest.mock import patch
 from datetime import datetime
 
-from django.urls import reverse
+from rest_framework.reverse import reverse
 from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.test import APITestCase
@@ -26,7 +26,7 @@ class FeedTestCase(APITestCase):
     def test_can_create_feed(self, mock_get):
         mock_get.return_value.content = samples.valid_feed
         data = {'url': 'http://planet.ubuntu.com/rss20.xml'}
-        response = self.client.post(reverse('feeds-list'), data)
+        response = self.client.post(reverse('v1:feeds-list'), data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(models.Feed.objects.count(), 1)
         feed = models.Feed.objects.get(url=data['url'])
@@ -38,10 +38,10 @@ class FeedTestCase(APITestCase):
     def test_feed_is_unique(self, mock_get):
         mock_get.return_value.content = samples.valid_feed
         data = {'url': 'http://planet.ubuntu.com/rss20.xml'}
-        response = self.client.post(reverse('feeds-list'), data)
+        response = self.client.post(reverse('v1:feeds-list'), data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        response = self.client.post(reverse('feeds-list'), data)
+        response = self.client.post(reverse('v1:feeds-list'), data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         self.assertEqual(models.Feed.objects.count(), 1)
@@ -54,7 +54,7 @@ class FeedTestCase(APITestCase):
             {'url': 'http://foo'},
         ]
         for datum in data:
-            response = self.client.post(reverse('feeds-list'), datum)
+            response = self.client.post(reverse('v1:feeds-list'), datum)
             self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
             self.assertIn(b'valid URL', response.content)
 
@@ -62,7 +62,7 @@ class FeedTestCase(APITestCase):
     def test_invalid_feed_returns_400(self, mock_get):
         mock_get.return_value.content = samples.invalid_feed
         data = {'url': 'http://planet.ubuntu.com/rss20.xml'}
-        response = self.client.post(reverse('feeds-list'), data)
+        response = self.client.post(reverse('v1:feeds-list'), data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(b'No feed found', response.content)
 
@@ -70,7 +70,7 @@ class FeedTestCase(APITestCase):
     def test_timeout_during_creation_returns_400(self, mock_response):
         mock_response.side_effect = Timeout
         data = {'url': 'http://planet.ubuntu.com/rss20.xml'}
-        response = self.client.post(reverse('feeds-list'), data)
+        response = self.client.post(reverse('v1:feeds-list'), data)
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn(b'resolving', response.content)
 
@@ -141,21 +141,21 @@ class BookmarkTestCase(APITestCase):
         data = {
             'entry': 1
         }
-        response = self.client.post(reverse('bookmarks-list'), data)
+        response = self.client.post(reverse('v1:bookmarks-list'), data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_can_unbookmark_entry(self):
         data = {
             'entry': 1
         }
-        response = self.client.post(reverse('bookmarks-list'), data)
+        response = self.client.post(reverse('v1:bookmarks-list'), data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         data = {
             'entry': 1,
             'is_bookmarked': False,
         }
-        response = self.client.put(reverse('bookmarks-detail',
+        response = self.client.put(reverse('v1:bookmarks-detail',
                                            args=[response.data['id']]), data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.data['is_bookmarked'], False)
@@ -164,14 +164,14 @@ class BookmarkTestCase(APITestCase):
         data = {
             'entry': 1
         }
-        response = self.client.post(reverse('bookmarks-list'), data)
+        response = self.client.post(reverse('v1:bookmarks-list'), data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
-        response = self.client.get(reverse('bookmarks-list'))
+        response = self.client.get(reverse('v1:bookmarks-list'))
         self.assertEqual(response.data['count'], 1)
         user = User.objects.get(username='mahan')
         self.client.force_authenticate(user=user)
-        response = self.client.get(reverse('bookmarks-list'))
+        response = self.client.get(reverse('v1:bookmarks-list'))
         self.assertEqual(response.data['count'], 0)
 
 
@@ -186,21 +186,21 @@ class ReadTestCase(APITestCase):
         data = {
             'entry': 1
         }
-        response = self.client.post(reverse('reads-list'), data)
+        response = self.client.post(reverse('v1:reads-list'), data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_can_unread_entry(self):
         data = {
             'entry': 1
         }
-        response = self.client.post(reverse('reads-list'), data)
+        response = self.client.post(reverse('v1:reads-list'), data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         data = {
             'entry': 1,
             'is_read': False,
         }
-        response = self.client.put(reverse('reads-detail',
+        response = self.client.put(reverse('v1:reads-detail',
                                            args=[response.data['id']]), data)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         read = models.Read.objects.get(pk=response.data['id'])
@@ -219,7 +219,7 @@ class CommentTestCase(APITestCase):
             'entry': 1,
             'content': 'sample content',
         }
-        response = self.client.post(reverse('comments-list'), data)
+        response = self.client.post(reverse('v1:comments-list'), data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
         comment = models.Comment.objects.first()
@@ -231,13 +231,13 @@ class CommentTestCase(APITestCase):
             'entry': 1,
             'content': 'sample content',
         }
-        response = self.client.post(reverse('comments-list'), data)
+        response = self.client.post(reverse('v1:comments-list'), data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        response = self.client.get(reverse('comments-list'))
+        response = self.client.get(reverse('v1:comments-list'))
         comment1 = response.data
         user = User.objects.get(username='mahan')
         self.client.force_authenticate(user=user)
-        response = self.client.get(reverse('comments-list'))
+        response = self.client.get(reverse('v1:comments-list'))
         comment2 = response.data
         self.assertDictEqual(comment1, comment2)
 

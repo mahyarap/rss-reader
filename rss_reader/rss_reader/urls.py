@@ -27,7 +27,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^login/$', auth_views.obtain_auth_token, name='login'),
     url(r'^signup/$', reader.views.SignUpView.as_view(), name='signup'),
-    url(r'^', include(reader.urls)),
+    url(r'^v1/', include(reader.urls, namespace='v1')),
 ]
 
 if settings.DEBUG:
