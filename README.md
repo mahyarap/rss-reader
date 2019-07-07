@@ -92,6 +92,9 @@ image resizing which is CPU-bound), I used the `eventlet` execution pool of
 Celery. `eventlet` uses cooperative multitasking which works very well for
 IO-bound use cases.
 
+The API is versioned to facilitate introducing new features and removing
+deprecated ones.
+
 I used the `signiture` and `group` features of Celery for parallel processing
 of the tasks in the workers. 
 
