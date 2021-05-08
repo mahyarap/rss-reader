@@ -6,7 +6,7 @@ chardet==3.0.4
 Django==1.11.21
 djangorestframework==3.9.4
 dnspython==1.16.0
-eventlet==0.25.0
+eventlet==0.31.0
 feedparser==5.2.1
 greenlet==0.4.15
 idna==2.8
